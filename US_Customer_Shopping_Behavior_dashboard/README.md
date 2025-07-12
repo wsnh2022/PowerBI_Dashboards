@@ -23,4 +23,4 @@
 ![Dashboard screenshot](https://github.com/wsnh2022/PowerBI_Dashboards/blob/master/US_Customer_Shopping_Behavior_dashboard/U.S%20Customer%20Shopping%20Behavior%20Dashboard%2010.0.png)
 
 # Dark Mode
-![Dashboard screenshot](https://raw.githubusercontent.com/wsnh2022/Power-BI-Dashboard/main/US_Customer_Shopping_Behavior_dashboard/U.S%20Customer%20Shopping%20Behavior%20Dashboard%2011.0.png)
+![Dashboard screenshot](https://github.com/wsnh2022/PowerBI_Dashboards/blob/master/US_Customer_Shopping_Behavior_dashboard/U.S%20Customer%20Shopping%20Behavior%20Dashboard%2011.0.png)
