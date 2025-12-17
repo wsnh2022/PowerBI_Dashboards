@@ -1,86 +1,44 @@
-# Power BI Desktop (Microsoft Store) vs EXE Installation
+# Power BI Desktop MySQL Setup Guide
 
-## Clean Uninstall, Reinstallation, and MySQL Connectivity — Detailed Reference Document
+Complete guide to installing Power BI Desktop and connecting to MySQL databases.
 
----
+## Microsoft Store vs EXE Installation
 
-## 1. Problem Context
+**Use the standalone EXE installer, not Microsoft Store.**
 
-Power BI Desktop installed via the **Microsoft Store** behaves differently from a traditional Windows desktop application. When facing persistent issues such as:
+### Why Store Version Causes Issues
 
-* MySQL authentication failures
-* Incorrect Windows authentication prompts
-* Connector handshake errors
-* Power BI not appearing in Revo Uninstaller or Control Panel
+Power BI from Microsoft Store is a UWP/MSIX package that:
+- Runs in a sandbox with restricted permissions
+- Doesn't appear in Control Panel or traditional uninstallers
+- Has unreliable MySQL connector behavior
+- Caches credentials incorrectly
 
-A **clean uninstall and reinstall using the EXE version** is often required.
+### Why EXE Version Works Better
 
-This document explains **why this happens**, **how to remove the Store version correctly**, and **how to reinstall Power BI cleanly for stable MySQL connectivity**.
+The standalone installer:
+- Uses standard Win32 architecture
+- Appears in Control Panel
+- Loads database connectors reliably
+- No sandbox restrictions
 
----
+## Clean Uninstall Procedure
 
-## 2. Why Power BI Desktop Does Not Appear in Revo or Control Panel
+### 1. Remove Microsoft Store Version
 
-### Root Reason
+**Method A: Microsoft Store**
+1. Open Microsoft Store → Library
+2. Find Power BI Desktop
+3. Click Uninstall
 
-Power BI Desktop installed from the Microsoft Store is a **UWP / MSIX package**, not a traditional Win32 application.
-
-### Consequences
-
-* No MSI / EXE installer
-* No Control Panel entry
-* No standard uninstall registry keys
-* Invisible to tools like Revo Uninstaller
-
-### Where Store Apps Live
-
-```
-C:\Program Files\WindowsApps\
-```
-
-This directory is protected by Windows and hidden by default.
-
-### Expected Behavior
-
-* ❌ Not visible in Control Panel
-* ❌ Not visible in Revo Uninstaller
-* ✅ Visible only in Microsoft Store (Open / Uninstall button)
-
-This is **normal behavior**, not a system fault.
-
----
-
-## 3. Correct Way to Uninstall Microsoft Store Version of Power BI
-
-### Method A — Microsoft Store (Recommended)
-
-1. Open **Microsoft Store**
-2. Go to **Library**
-3. Locate **Power BI Desktop**
-4. Click **Uninstall**
-
-This cleanly removes the MSIX package.
-
----
-
-### Method B — PowerShell Forced Removal (If Store Fails)
-
-Run **PowerShell as Administrator**:
-
+**Method B: PowerShell** (if Store fails)
 ```powershell
 Get-AppxPackage *PowerBI* | Remove-AppxPackage
 ```
 
-This force-removes the Store-installed Power BI Desktop.
+### 2. Delete Local Data
 
----
-
-## 4. Manual Cleanup After Uninstall (Critical)
-
-Even after uninstalling, Power BI leaves behind **local data, cached credentials, and connector state**.
-
-Delete the following folders if they exist:
-
+Remove these folders:
 ```
 C:\Users\<username>\Documents\Power BI Desktop
 C:\Users\<username>\AppData\Local\Microsoft\Power BI
@@ -88,81 +46,43 @@ C:\Users\<username>\AppData\Local\Microsoft\Power BI Desktop
 C:\Users\<username>\AppData\Roaming\Microsoft\Power BI
 ```
 
----
+### 3. Clear Cached Credentials
 
-## 5. Clear Cached Credentials (Non‑Optional)
+1. Open Control Panel → Credential Manager
+2. Windows Credentials
+3. Delete entries containing:
+   - Power BI
+   - MySQL
+   - localhost
+   - ODBC
 
-Power BI aggressively caches failed authentication attempts.
+### 4. Reboot
 
-1. Open **Control Panel**
-2. Go to **Credential Manager**
-3. Open **Windows Credentials**
-4. Delete any entries related to:
+Required to clear loaded DLLs and credential providers.
 
-   * Power BI
-   * MySQL
-   * localhost
-   * ODBC
-   * SQL
+## Installation
 
-Failure to do this can cause repeated authentication errors even after reinstall.
+### 1. Install Power BI Desktop
 
----
+Download and install the standalone EXE from [Microsoft Power BI](https://powerbi.microsoft.com/desktop/).
 
-## 6. Reboot the System
+### 2. Install MySQL Connector
 
-Rebooting clears:
+**Required:** MySQL Connector/NET (64-bit, version 8.0.x)
 
-* Loaded connector DLLs
-* Locked credential providers
-* Residual MSIX bindings
+Download from [MySQL Downloads](https://dev.mysql.com/downloads/connector/net/).
 
-Do not skip this step.
+**Note:** Power BI does not use MySQL Workbench. It requires the standalone connector.
 
----
+### 3. Reboot Again
 
-## 7. Correct Reinstallation Procedure (EXE Version)
+Required after connector installation.
 
-### Why EXE Version Is Preferred
+## MySQL Configuration
 
-The EXE installer:
+### Force Native Authentication
 
-* Uses classic Win32 architecture
-* Is visible to Control Panel and Revo
-* Loads connectors reliably
-* Avoids Store sandbox limitations
-* Is more stable for MySQL connectivity
-
-### Installation Steps
-
-1. Download **Power BI Desktop (x64 EXE)** from Microsoft official website
-2. Install normally
-
----
-
-## 8. Install MySQL Connector (Mandatory)
-
-Power BI **does not use MySQL Workbench**.
-
-It requires:
-
-* **MySQL Connector/NET**
-* **64‑bit version only**
-* Version **8.0.x**
-
-Install the connector **after** installing Power BI Desktop.
-
-Reboot again after installation.
-
----
-
-## 9. MySQL Authentication Configuration
-
-Power BI often fails with MySQL’s default authentication plugin.
-
-Force classic authentication.
-
-Run in MySQL Workbench:
+MySQL's default authentication plugin causes connection failures. Switch to native password:
 
 ```sql
 ALTER USER 'root'@'localhost'
@@ -172,79 +92,68 @@ BY 'your_password';
 FLUSH PRIVILEGES;
 ```
 
-Restart MySQL service.
+Restart MySQL service after running this command.
 
----
+## Connecting from Power BI
 
-## 10. First Connection Setup in Power BI
+### Connection Steps
 
-Use this exact sequence:
+1. Power BI Desktop → Home → Get Data → MySQL database
+2. Enter connection details:
+   ```
+   Server: localhost
+   Database: your_database_name
+   ```
+3. Authentication settings:
+   - Authentication kind: **Database**
+   - **Use alternate credentials**
+   - Username: MySQL username
+   - Password: MySQL password
+   - Apply level: `localhost:3306`
+4. Click Connect
 
-```
-Home → Get Data → MySQL database
-```
+### Authentication Notes
 
-Connection details:
+- **Always use "Database" authentication**
+- Do NOT use "Windows" authentication (MySQL doesn't support it)
+- The UI may show "Windows authentication" but this is misleading
 
-```
-Server: localhost
-Database: sakila
-```
+## Troubleshooting
 
-Authentication:
+### "Pre-login handshake" Error
 
-* Authentication kind: Database
-* Select: Use alternate credentials
-* Username: MySQL username
-* Password: MySQL password
-* Apply level: localhost:3306
+**Cause:** Using SQL Server connector instead of MySQL connector
 
-Connect.
-
----
-
-## 11. Common Errors and Their Meaning
-
-### Windows Authentication Prompt
-
-* Misleading UI text
-* MySQL does NOT support Windows authentication
-* Always use Database credentials
-
-### Pre-login Handshake Error
-
-* SQL Server connector used by mistake
-* Wrong protocol
-* Use MySQL database connector only
+**Fix:** Use "MySQL database" connector, not "SQL Server"
 
 ### Credential Loop
 
-* Cached failed credentials
-* Fix by clearing Credential Manager
+**Cause:** Cached failed credentials
 
----
+**Fix:** Clear Credential Manager (see step 3 under Clean Uninstall)
 
-## 12. Final Outcome
+### "Windows authentication required" Prompt
 
-After following this document:
+**Cause:** Misleading UI text
 
-* Power BI loads MySQL tables immediately
-* No Windows authentication prompts
-* No handshake or TCP errors
-* Stable, repeatable MySQL connections
+**Fix:** Ignore the message, use Database authentication
 
----
+## Verification
 
-## 13. Key Takeaway
+After setup, Power BI should:
+- Load MySQL tables immediately
+- Show no authentication prompts
+- Connect reliably without errors
 
-This issue is caused by:
+## Summary
 
-* Microsoft Store sandboxing
-* Power BI credential cache behavior
-* MySQL authentication plugin mismatch
+**Root causes of connection issues:**
+- Microsoft Store sandboxing
+- Credential caching behavior
+- MySQL authentication plugin mismatch
 
-A **clean EXE-based install + connector reset** is the correct engineering solution.
-
----
-
-End of document.
+**Solution:**
+- Clean EXE-based install
+- Proper connector installation
+- Native password authentication
+- Complete credential reset
