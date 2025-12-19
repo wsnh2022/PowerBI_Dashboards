@@ -1,3 +1,4 @@
+```python
 # VARIABLES
 x = 5                    # assignment
 x, y = 1, 2             # multiple assignment
@@ -163,3 +164,6 @@ if 0 < x < 10:
 
 # Multiple conditions
 if x in [1, 2, 3]:
+```
+
+Core concepts you'll use constantly!
