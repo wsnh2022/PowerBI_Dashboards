@@ -16,7 +16,7 @@
 10. [Statistical Analysis](#statistical-analysis)
 11. [Advanced Pandas Techniques](#advanced-pandas-techniques)
 12. [Performance Optimization](#performance-optimization)
-
+13. [Code-Editor-vs-IDE](#Code-Editor-vs-IDE-Integrated-Development-Environment)
 ---
 
 ## Basics & Fundamentals
@@ -1803,6 +1803,66 @@ datetime64    # Date and time
 timedelta     # Time difference
 category      # Categorical
 ```
+
+---
+
+# #Code-Editor-vs-IDE-(Integrated-Development-Environment)
+Reference: [https://youtu.be/K5KVEU3aaeQ?si=j-ZaUz9tau4Fl0ir&t=459](https://youtu.be/K5KVEU3aaeQ?si=j-ZaUz9tau4Fl0ir&t=459)
+
+---
+
+### Code Editor
+
+Lightweight tools focused on writing and editing source code.
+
+Examples: VS Code, Atom, Sublime Text
+
+Characteristics:
+
+* Fast and minimal
+* Core job: text editing
+* Advanced features added via extensions
+* Developer assembles their own toolchain
+
+---
+
+### IDE (Integrated Development Environment)
+
+A complete development workspace with built-in intelligence.
+
+Example: PyCharm
+
+An IDE bundles multiple development tools into one system.
+
+Core capabilities:
+
+* **Linting**
+  Static code analysis that detects syntax errors, bad practices, and style issues before runtime.
+
+* **Autocompletion**
+  Context-aware suggestions based on language semantics, project structure, and types—not just text matching.
+
+* **Debugging**
+  Step-through execution, breakpoints, variable inspection, and call-stack analysis to understand program behavior.
+
+* **Code Formatting**
+  Automatic enforcement of consistent style rules across files and teams.
+
+* **Unit Testing**
+  Built-in test runners, test discovery, and result visualization to validate logic continuously.
+
+* **Code Snippets**
+  Reusable templates for common patterns to reduce boilerplate and cognitive load.
+
+---
+
+### Core distinction
+
+A **code editor** helps you write code.
+An **IDE** helps you design, run, debug, test, and maintain software as a system.
+
+Editors scale by plugins.
+IDEs scale by integration.
 
 ---
 
